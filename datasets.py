@@ -148,13 +148,17 @@ class CustomDataset(Dataset):
             # Labels to tensor.
             labels = torch.as_tensor(labels, dtype=torch.int64)
         else:
-            boxes = torch.as_tensor(boxes, dtype=torch.float32)
-            # Area of the bounding boxes.
-            area = torch.as_tensor(0)
-            # No crowd instances.
-            iscrowd = torch.zeros((boxes.shape[0],), dtype=torch.int64)
-            # Labels to tensor.
-            labels = torch.zeros(5, dtype=torch.int64)#todo replace hard coded "5" with somthing more generic
+            boxes = torch.zeros((0, 4), dtype=torch.float32)
+            labels = torch.zeros((1, 1), dtype=torch.int64)
+            area = (boxes[:, 3] - boxes[:, 1]) * (boxes[:, 2] - boxes[:, 0])
+            iscrowd = torch.zeros((0,), dtype=torch.int64)
+        #     boxes = torch.as_tensor(boxes, dtype=torch.float32)
+        #     # Area of the bounding boxes.
+        #     area = torch.as_tensor(0)
+        #     # No crowd instances.
+        #     iscrowd = torch.zeros((boxes.shape[0],), dtype=torch.int64)
+        #     # Labels to tensor.
+        #     labels = torch.zeros(5, dtype=torch.int64) #todo replace hard coded "5" with somthing more generic
         return image, image_resized, orig_boxes, \
             boxes, labels, area, iscrowd, (image_width, image_height)
 
