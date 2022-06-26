@@ -13,13 +13,14 @@ from utils.transforms import (
     get_train_aug
 )
 
+
 # the dataset class
 class CustomDataset(Dataset):
     def __init__(
-        self, images_path, labels_path, 
-        width, height, classes, transforms=None, 
-        use_train_aug=False,
-        train=False, mosaic=False
+            self, images_path, labels_path,
+            width, height, classes, transforms=None,
+            use_train_aug=False,
+            train=False, mosaic=False
     ):
         self.transforms = transforms
         self.use_train_aug = use_train_aug
@@ -32,7 +33,7 @@ class CustomDataset(Dataset):
         self.mosaic = mosaic
         self.image_file_types = ['*.jpg', '*.jpeg', '*.png', '*.ppm']
         self.all_image_paths = []
-        
+
         # get all the image paths in sorted order
         for file_type in self.image_file_types:
             self.all_image_paths.extend(glob.glob(f"{self.images_path}/{file_type}"))
@@ -41,13 +42,13 @@ class CustomDataset(Dataset):
         self.all_images = sorted(self.all_images)
         # Remove all annotations and images when no object is present.
         self.read_and_clean()
-        
+
     def read_and_clean(self):
         # Discard any images and labels when the XML 
         # file does not contain any object.
         for annot_path in self.all_annot_paths:
             if "Hasolelim_11_07_21_back_1065" in annot_path:
-                print("\n"+"-"*10+"\ndebug\n\n\n\n")
+                print("\n" + "-" * 10 + "\ndebug\n\n\n\n")
             tree = et.parse(annot_path)
             root = tree.getroot()
             object_present = False
@@ -58,7 +59,7 @@ class CustomDataset(Dataset):
                 image_name = annot_path.split(os.path.sep)[-1].split('.xml')[0]
                 image_root = self.all_image_paths[0].split(os.path.sep)[:-1]
                 # remove_image = f"{'/'.join(image_root)}\\{image_name}.jpg"
-                remove_image = os.path.join(*image_root,image_name+".jpg")
+                remove_image = os.path.join(*image_root, image_name + ".jpg")
                 print(f"Removing {annot_path} and corresponding {remove_image}")
                 self.all_annot_paths.remove(annot_path)
                 self.all_image_paths.remove(remove_image)
@@ -67,7 +68,7 @@ class CustomDataset(Dataset):
         # is not found for the image. 
         for image_name in self.all_images:
             # possible_xml_name = f"{self.labels_path}/{image_name.split('.jpg')[0]}.xml"
-            possible_xml_name = os.path.join(self.labels_path,image_name.split('.jpg')[0]+".xml")
+            possible_xml_name = os.path.join(self.labels_path, image_name.split('.jpg')[0] + ".xml")
             if possible_xml_name not in self.all_annot_paths:
                 print(f"{possible_xml_name} not found...")
                 print(f"Removing {image_name} image")
@@ -93,27 +94,27 @@ class CustomDataset(Dataset):
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB).astype(np.float32)
         image_resized = cv2.resize(image, (self.width, self.height))
         image_resized /= 255.0
-        
+
         # Capture the corresponding XML file for getting the annotations.
         annot_filename = image_name[:-4] + '.xml'
         annot_file_path = os.path.join(self.labels_path, annot_filename)
-        
+
         boxes = []
         orig_boxes = []
         labels = []
         tree = et.parse(annot_file_path)
         root = tree.getroot()
-        
+
         # Get the height and width of the image.
         image_width = image.shape[1]
         image_height = image.shape[0]
-                
+
         # Box coordinates for xml files are extracted and corrected for image size given.
         for member in root.findall('object'):
             # Map the current object name to `classes` list to get
             # the label index and append to `labels` list.
             labels.append(self.classes.index(member.find('name').text))
-            
+
             # xmin = left corner x-coordinates
             xmin = int(member.find('bndbox').find('xmin').text)
             # xmax = right corner x-coordinates
@@ -128,16 +129,16 @@ class CustomDataset(Dataset):
             )
 
             orig_boxes.append([xmin, ymin, xmax, ymax])
-            
+
             # Resize the bounding boxes according to the
             # desired `width`, `height`.
-            xmin_final = (xmin/image_width)*self.width
-            xmax_final = (xmax/image_width)*self.width
-            ymin_final = (ymin/image_height)*self.height
-            ymax_final = (ymax/image_height)*self.height
-            
+            xmin_final = (xmin / image_width) * self.width
+            xmax_final = (xmax / image_width) * self.width
+            ymin_final = (ymin / image_height) * self.height
+            ymax_final = (ymax / image_height) * self.height
+
             boxes.append([xmin_final, ymin_final, xmax_final, ymax_final])
-        
+
         # Bounding box to tensor.
         if boxes:
             boxes = torch.as_tensor(boxes, dtype=torch.float32)
@@ -160,7 +161,7 @@ class CustomDataset(Dataset):
         #     # Labels to tensor.
         #     labels = torch.zeros(5, dtype=torch.int64) #todo replace hard coded "5" with somthing more generic
         return image, image_resized, orig_boxes, \
-            boxes, labels, area, iscrowd, (image_width, image_height)
+               boxes, labels, area, iscrowd, (image_width, image_height)
 
     def check_image_and_annotation(self, xmax, ymax, width, height):
         """
@@ -173,7 +174,6 @@ class CustomDataset(Dataset):
             xmax = width
         return ymax, xmax
 
-
     def load_cutmix_image_and_boxes(self, index, resize_factor=512):
         """ 
         Adapted from: https://www.kaggle.com/shonenkov/oof-evaluation-mixup-efficientdet
@@ -184,10 +184,10 @@ class CustomDataset(Dataset):
         image = cv2.resize(image, resize_factor)
         h, w, c = image.shape
         s = h // 2
-    
+
         xc, yc = [int(random.uniform(h * 0.25, w * 0.75)) for _ in range(2)]  # center x, y
         indexes = [index] + [random.randint(0, len(self.all_images) - 1) for _ in range(3)]
-        
+
         # Create empty image with the above resized image.
         result_image = np.full((h, w, 3), 1, dtype=np.float32)
         result_boxes = []
@@ -196,7 +196,7 @@ class CustomDataset(Dataset):
         for i, index in enumerate(indexes):
             image, image_resized, orig_boxes, boxes, \
             labels, area, iscrowd, dims = self.load_image_and_labels(
-            index=index
+                index=index
             )
             # Resize the current image according to the above resize,
             # else `result_image[y1a:y2a, x1a:x2a] = image[y1b:y2b, x1b:x2b]`
@@ -226,39 +226,41 @@ class CustomDataset(Dataset):
                 for class_name in labels:
                     result_classes.append(class_name)
 
-                final_classes = []
-                result_boxes = np.concatenate(result_boxes, 0)
-                np.clip(result_boxes[:, 0:], 0, 2 * s, out=result_boxes[:, 0:])
-                result_boxes = result_boxes.astype(np.int32)
-                for idx in range(len(result_boxes)):
-                    if ((result_boxes[idx,2]-result_boxes[idx,0])*(result_boxes[idx,3]-result_boxes[idx,1])) > 0:
-                        final_classes.append(result_classes[idx])
-                result_boxes = result_boxes[
-                    np.where((result_boxes[:,2]-result_boxes[:,0])*(result_boxes[:,3]-result_boxes[:,1]) > 0)
-                ]
-            else:
-                result_boxes = boxes
-                pass
-        return orig_image, result_image/255., torch.tensor(result_boxes), \
-            torch.tensor(np.array(final_classes)), area, iscrowd, dims
+        final_classes = []
+        result_boxes = np.concatenate(result_boxes, 0)
+        np.clip(result_boxes[:, 0:], 0, 2 * s, out=result_boxes[:, 0:])
+        result_boxes = result_boxes.astype(np.int32)
+        for idx in range(len(result_boxes)):
+            if ((result_boxes[idx, 2] - result_boxes[idx, 0]) * (
+                    result_boxes[idx, 3] - result_boxes[idx, 1])) > 0:
+                final_classes.append(result_classes[idx])
+        result_boxes = result_boxes[
+            np.where((result_boxes[:, 2] - result_boxes[:, 0]) * (result_boxes[:, 3] - result_boxes[:, 1]) > 0)
+        ]
+
+
+
+
+        return orig_image, result_image / 255., torch.tensor(result_boxes), \
+               torch.tensor(np.array(final_classes)), area, iscrowd, dims
 
     def __getitem__(self, idx):
         # Capture the image name and the full image path.
         if not self.mosaic:
             image, image_resized, orig_boxes, boxes, \
-                labels, area, iscrowd, dims = self.load_image_and_labels(
+            labels, area, iscrowd, dims = self.load_image_and_labels(
                 index=idx
             )
 
         if self.train and self.mosaic:
             while True:
                 image, image_resized, boxes, labels, \
-                    area, iscrowd, dims = self.load_cutmix_image_and_boxes(
+                area, iscrowd, dims = self.load_cutmix_image_and_boxes(
                     idx, resize_factor=(self.height, self.width)
                 )
                 if len(boxes) > 0:
                     break
-        
+
         # visualize_mosaic_images(boxes, labels, image_resized, self.classes)
 
         # Prepare the final `target` dictionary.
@@ -269,11 +271,11 @@ class CustomDataset(Dataset):
         target["iscrowd"] = iscrowd
         image_id = torch.tensor([idx])
         target["image_id"] = image_id
-        if self.use_train_aug: # Use train augmentation if argument is passed.
+        if self.use_train_aug:  # Use train augmentation if argument is passed.
             train_aug = get_train_aug()
             sample = train_aug(image=image_resized,
-                                     bboxes=target['boxes'],
-                                     labels=labels)
+                               bboxes=target['boxes'],
+                               labels=labels)
             image_resized = sample['image']
             target['boxes'] = torch.Tensor(sample['bboxes'])
         else:
@@ -282,12 +284,12 @@ class CustomDataset(Dataset):
                                      labels=labels)
             image_resized = sample['image']
             target['boxes'] = torch.Tensor(sample['bboxes'])
-        
-            
+
         return image_resized, target
 
     def __len__(self):
         return len(self.all_images)
+
 
 def collate_fn(batch):
     """
@@ -296,32 +298,36 @@ def collate_fn(batch):
     """
     return tuple(zip(*batch))
 
+
 # Prepare the final datasets and data loaders.
 def create_train_dataset(
-    train_dir_images, train_dir_labels, 
-    resize_width, resize_height, classes,
-    use_train_aug=False,
-    mosaic=True
+        train_dir_images, train_dir_labels,
+        resize_width, resize_height, classes,
+        use_train_aug=False,
+        mosaic=True
 ):
     train_dataset = CustomDataset(
         train_dir_images, train_dir_labels,
-        resize_width, resize_height, classes, 
+        resize_width, resize_height, classes,
         get_train_transform(),
         use_train_aug=use_train_aug,
         train=True, mosaic=mosaic
     )
     return train_dataset
+
+
 def create_valid_dataset(
-    valid_dir_images, valid_dir_labels, 
-    resize_width, resize_height, classes
+        valid_dir_images, valid_dir_labels,
+        resize_width, resize_height, classes
 ):
     valid_dataset = CustomDataset(
-        valid_dir_images, valid_dir_labels, 
-        resize_width, resize_height, classes, 
+        valid_dir_images, valid_dir_labels,
+        resize_width, resize_height, classes,
         get_valid_transform(),
         train=False
     )
     return valid_dataset
+
 
 def create_train_loader(train_dataset, batch_size, num_workers=0):
     train_loader = DataLoader(
@@ -332,6 +338,8 @@ def create_train_loader(train_dataset, batch_size, num_workers=0):
         collate_fn=collate_fn
     )
     return train_loader
+
+
 def create_valid_loader(valid_dataset, batch_size, num_workers=0):
     valid_loader = DataLoader(
         valid_dataset,
