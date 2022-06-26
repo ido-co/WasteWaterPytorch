@@ -1,0 +1,27 @@
+<annotation>
+	<folder></folder>
+	<filename>Bitaniya_15_08_21_back_1368_png.rf.823f561fd676f4f5f78fe35dca3f4482.jpg</filename>
+	<path>Bitaniya_15_08_21_back_1368_png.rf.823f561fd676f4f5f78fe35dca3f4482.jpg</path>
+	<source>
+		<database>roboflow.ai</database>
+	</source>
+	<size>
+		<width>2560</width>
+		<height>1920</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>open_floc</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<occluded>0</occluded>
+		<bndbox>
+			<xmin>333</xmin>
+			<xmax>2390</xmax>
+			<ymin>8</ymin>
+			<ymax>1891</ymax>
+		</bndbox>
+	</object>
+</annotation>

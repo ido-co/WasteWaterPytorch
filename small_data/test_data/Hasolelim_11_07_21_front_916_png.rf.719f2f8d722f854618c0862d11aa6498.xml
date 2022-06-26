@@ -1,0 +1,27 @@
+<annotation>
+	<folder></folder>
+	<filename>Hasolelim_11_07_21_front_916_png.rf.719f2f8d722f854618c0862d11aa6498.jpg</filename>
+	<path>Hasolelim_11_07_21_front_916_png.rf.719f2f8d722f854618c0862d11aa6498.jpg</path>
+	<source>
+		<database>roboflow.ai</database>
+	</source>
+	<size>
+		<width>2560</width>
+		<height>1920</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>open_floc</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<occluded>0</occluded>
+		<bndbox>
+			<xmin>356</xmin>
+			<xmax>1801</xmax>
+			<ymin>214</ymin>
+			<ymax>1849</ymax>
+		</bndbox>
+	</object>
+</annotation>

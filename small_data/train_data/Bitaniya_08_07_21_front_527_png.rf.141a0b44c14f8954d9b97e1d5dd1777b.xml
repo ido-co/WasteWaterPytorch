@@ -1,0 +1,14 @@
+<annotation>
+	<folder></folder>
+	<filename>Bitaniya_08_07_21_front_527_png.rf.141a0b44c14f8954d9b97e1d5dd1777b.jpg</filename>
+	<path>Bitaniya_08_07_21_front_527_png.rf.141a0b44c14f8954d9b97e1d5dd1777b.jpg</path>
+	<source>
+		<database>roboflow.ai</database>
+	</source>
+	<size>
+		<width>2560</width>
+		<height>1920</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+</annotation>

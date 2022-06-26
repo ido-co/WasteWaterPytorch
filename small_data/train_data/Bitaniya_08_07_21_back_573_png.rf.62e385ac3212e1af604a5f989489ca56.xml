@@ -1,0 +1,27 @@
+<annotation>
+	<folder></folder>
+	<filename>Bitaniya_08_07_21_back_573_png.rf.62e385ac3212e1af604a5f989489ca56.jpg</filename>
+	<path>Bitaniya_08_07_21_back_573_png.rf.62e385ac3212e1af604a5f989489ca56.jpg</path>
+	<source>
+		<database>roboflow.ai</database>
+	</source>
+	<size>
+		<width>2560</width>
+		<height>1920</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>filament</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<occluded>0</occluded>
+		<bndbox>
+			<xmin>1</xmin>
+			<xmax>1661</xmax>
+			<ymin>379</ymin>
+			<ymax>1529</ymax>
+		</bndbox>
+	</object>
+</annotation>

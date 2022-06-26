@@ -1,0 +1,27 @@
+<annotation>
+	<folder></folder>
+	<filename>Hasolelim_11_07_21_front_963_png.rf.d9926dc86fe12dc677e15e2efdf32d6c.jpg</filename>
+	<path>Hasolelim_11_07_21_front_963_png.rf.d9926dc86fe12dc677e15e2efdf32d6c.jpg</path>
+	<source>
+		<database>roboflow.ai</database>
+	</source>
+	<size>
+		<width>2560</width>
+		<height>1920</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>filament</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<occluded>0</occluded>
+		<bndbox>
+			<xmin>2057</xmin>
+			<xmax>2561</xmax>
+			<ymin>11</ymin>
+			<ymax>1101</ymax>
+		</bndbox>
+	</object>
+</annotation>

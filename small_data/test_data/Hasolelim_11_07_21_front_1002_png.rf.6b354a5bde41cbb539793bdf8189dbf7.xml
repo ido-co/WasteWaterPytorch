@@ -1,0 +1,27 @@
+<annotation>
+	<folder></folder>
+	<filename>Hasolelim_11_07_21_front_1002_png.rf.6b354a5bde41cbb539793bdf8189dbf7.jpg</filename>
+	<path>Hasolelim_11_07_21_front_1002_png.rf.6b354a5bde41cbb539793bdf8189dbf7.jpg</path>
+	<source>
+		<database>roboflow.ai</database>
+	</source>
+	<size>
+		<width>2560</width>
+		<height>1920</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>spherical_floc</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<occluded>0</occluded>
+		<bndbox>
+			<xmin>1699</xmin>
+			<xmax>2561</xmax>
+			<ymin>456</ymin>
+			<ymax>1721</ymax>
+		</bndbox>
+	</object>
+</annotation>

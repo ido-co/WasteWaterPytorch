@@ -1,0 +1,27 @@
+<annotation>
+	<folder></folder>
+	<filename>Bitaniya_04_07_21_front_169_png.rf.e1e827885af298f0d7cb5e567dbcb594.jpg</filename>
+	<path>Bitaniya_04_07_21_front_169_png.rf.e1e827885af298f0d7cb5e567dbcb594.jpg</path>
+	<source>
+		<database>roboflow.ai</database>
+	</source>
+	<size>
+		<width>2560</width>
+		<height>1920</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>protozoa</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<occluded>0</occluded>
+		<bndbox>
+			<xmin>1213</xmin>
+			<xmax>1997</xmax>
+			<ymin>84</ymin>
+			<ymax>651</ymax>
+		</bndbox>
+	</object>
+</annotation>

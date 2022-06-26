@@ -1,0 +1,14 @@
+<annotation>
+	<folder></folder>
+	<filename>Hasolelim_11_07_21_back_1165_png.rf.090130cb04844b65042c188812c5b790.jpg</filename>
+	<path>Hasolelim_11_07_21_back_1165_png.rf.090130cb04844b65042c188812c5b790.jpg</path>
+	<source>
+		<database>roboflow.ai</database>
+	</source>
+	<size>
+		<width>2560</width>
+		<height>1920</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+</annotation>

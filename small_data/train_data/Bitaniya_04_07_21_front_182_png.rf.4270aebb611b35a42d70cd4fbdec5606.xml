@@ -1,0 +1,27 @@
+<annotation>
+	<folder></folder>
+	<filename>Bitaniya_04_07_21_front_182_png.rf.4270aebb611b35a42d70cd4fbdec5606.jpg</filename>
+	<path>Bitaniya_04_07_21_front_182_png.rf.4270aebb611b35a42d70cd4fbdec5606.jpg</path>
+	<source>
+		<database>roboflow.ai</database>
+	</source>
+	<size>
+		<width>2560</width>
+		<height>1920</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>spherical_floc</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<occluded>0</occluded>
+		<bndbox>
+			<xmin>439</xmin>
+			<xmax>1913</xmax>
+			<ymin>401</ymin>
+			<ymax>1751</ymax>
+		</bndbox>
+	</object>
+</annotation>
