@@ -12,19 +12,19 @@ from torch_utils.engine import (
     train_one_epoch, evaluate
 )
 from datasets import (
-    create_train_dataset, create_valid_dataset, 
+    create_train_dataset, create_valid_dataset,
     create_train_loader, create_valid_loader
 )
 from models.create_fasterrcnn_model import create_model
 from utils.general import (
-    set_training_dir, Averager, 
+    set_training_dir, Averager,
     save_model, save_train_loss_plot,
     show_tranformed_image,
     save_mAP, save_model_state
 )
 from utils.logging import (
     log, set_log, coco_log,
-    set_summary_writer, tensorboard_loss_log, 
+    set_summary_writer, tensorboard_loss_log,
     tensorboard_map_log,
     csv_log
 )
@@ -36,6 +36,7 @@ import numpy as np
 
 # For same annotation colors each time.
 np.random.seed(42)
+
 
 def parse_opt():
     # Construct the argument parser.
@@ -49,7 +50,7 @@ def parse_opt():
         help='path to the data config file'
     )
     parser.add_argument(
-        '-d', '--device', 
+        '-d', '--device',
         default=torch.device('cuda:0' if torch.cuda.is_available() else 'cpu'),
         help='computation/training device, default is GPU if GPU present'
     )
@@ -62,11 +63,11 @@ def parse_opt():
         help='number of workers for data processing/transforms/augmentations'
     )
     parser.add_argument(
-        '-b', '--batch-size', dest='batch_size', default=4, type=int, 
+        '-b', '--batch-size', dest='batch_size', default=4, type=int,
         help='batch size to load the data'
     )
     parser.add_argument(
-        '-ims', '--img-size', dest='img_size', default=512, type=int, 
+        '-ims', '--img-size', dest='img_size', default=512, type=int,
         help='image size to feed to the network'
     )
     parser.add_argument(
@@ -97,11 +98,12 @@ def parse_opt():
     args = vars(parser.parse_args())
     return args
 
+
 def main(args):
     # Load the data configurations
     with open(args['config']) as file:
         data_configs = yaml.safe_load(file)
-    
+
     # Settings/parameters/constants.
     TRAIN_DIR_IMAGES = data_configs['TRAIN_DIR_IMAGES']
     TRAIN_DIR_LABELS = data_configs['TRAIN_DIR_LABELS']
@@ -124,7 +126,7 @@ def main(args):
     # Model configurations
     IMAGE_WIDTH = args['img_size']
     IMAGE_HEIGHT = args['img_size']
-    
+
     train_dataset = create_train_dataset(
         TRAIN_DIR_IMAGES, TRAIN_DIR_LABELS,
         IMAGE_WIDTH, IMAGE_HEIGHT, CLASSES,
@@ -132,7 +134,7 @@ def main(args):
         mosaic=args['no_mosaic']
     )
     valid_dataset = create_valid_dataset(
-        VALID_DIR_IMAGES, VALID_DIR_LABELS, 
+        VALID_DIR_IMAGES, VALID_DIR_LABELS,
         IMAGE_WIDTH, IMAGE_HEIGHT, CLASSES
     )
     train_loader = create_train_loader(train_dataset, BATCH_SIZE, NUM_WORKERS)
@@ -160,8 +162,8 @@ def main(args):
     if args['weights'] is not None:
         print('Loading trained weights...')
         checkpoint = torch.load(args['weights'], map_location=DEVICE)
-        print(checkpoint)        
-        model.load_state_dict(checkpoint['model_state_dict'])        
+        print(checkpoint)
+        model.load_state_dict(checkpoint['model_state_dict'])
         if checkpoint['epoch']:
             start_epochs = checkpoint['epoch']
             print(f"Resuming from epoch {start_epochs}...")
@@ -187,7 +189,7 @@ def main(args):
         # If `steps = 5`, LR will slowly reduce to zero every 5 epochs.
         steps = NUM_EPOCHS + 10
         scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(
-            optimizer, 
+            optimizer,
             T_0=steps,
             T_mult=1,
             verbose=False
@@ -199,19 +201,19 @@ def main(args):
         train_loss_hist.reset()
 
         _, batch_loss_list = train_one_epoch(
-            model, 
-            optimizer, 
-            train_loader, 
-            DEVICE, 
-            epoch, 
+            model,
+            optimizer,
+            train_loader,
+            DEVICE,
+            epoch,
             train_loss_hist,
             print_freq=100,
             scheduler=scheduler
         )
 
         coco_evaluator, stats = evaluate(
-            model, 
-            valid_loader, 
+            model,
+            valid_loader,
             device=DEVICE,
             save_valid_preds=SAVE_VALID_PREDICTIONS,
             out_dir=OUT_DIR,
@@ -236,11 +238,11 @@ def main(args):
         save_train_loss_plot(OUT_DIR, train_loss_list)
         # Save loss plot for epoch-wise list.
         save_train_loss_plot(
-            OUT_DIR, 
+            OUT_DIR,
             train_loss_list_epoch,
             'epochs',
             'train loss',
-            save_name='train_loss_epoch' 
+            save_name='train_loss_epoch'
         )
 
         # Save mAP plots.
@@ -251,14 +253,15 @@ def main(args):
         tensorboard_loss_log('Train loss', np.array(train_loss_list_epoch), writer)
         # Save mAP plot using TensorBoard.
         tensorboard_map_log(
-            name='mAP', 
-            val_map_05=np.array(val_map_05), 
+            name='mAP',
+            val_map_05=np.array(val_map_05),
             val_map=np.array(val_map),
             writer=writer
         )
 
         coco_log(OUT_DIR, stats)
         csv_log(OUT_DIR, stats, epoch)
+
 
 if __name__ == '__main__':
     args = parse_opt()

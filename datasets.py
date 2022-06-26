@@ -46,6 +46,8 @@ class CustomDataset(Dataset):
         # Discard any images and labels when the XML 
         # file does not contain any object.
         for annot_path in self.all_annot_paths:
+            if "Hasolelim_11_07_21_back_1065" in annot_path:
+                print("\n"+"-"*10+"\ndebug\n\n\n\n")
             tree = et.parse(annot_path)
             root = tree.getroot()
             object_present = False
@@ -55,7 +57,8 @@ class CustomDataset(Dataset):
             if object_present == False:
                 image_name = annot_path.split(os.path.sep)[-1].split('.xml')[0]
                 image_root = self.all_image_paths[0].split(os.path.sep)[:-1]
-                remove_image = f"{'/'.join(image_root)}/{image_name}.jpg"
+                # remove_image = f"{'/'.join(image_root)}\\{image_name}.jpg"
+                remove_image = os.path.join(*image_root,image_name+".jpg")
                 print(f"Removing {annot_path} and corresponding {remove_image}")
                 self.all_annot_paths.remove(annot_path)
                 self.all_image_paths.remove(remove_image)
@@ -63,7 +66,8 @@ class CustomDataset(Dataset):
         # Discard any image file when no annotation file 
         # is not found for the image. 
         for image_name in self.all_images:
-            possible_xml_name = f"{self.labels_path}/{image_name.split('.jpg')[0]}.xml"
+            # possible_xml_name = f"{self.labels_path}/{image_name.split('.jpg')[0]}.xml"
+            possible_xml_name = os.path.join(self.labels_path,image_name.split('.jpg')[0]+".xml")
             if possible_xml_name not in self.all_annot_paths:
                 print(f"{possible_xml_name} not found...")
                 print(f"Removing {image_name} image")
@@ -135,13 +139,22 @@ class CustomDataset(Dataset):
             boxes.append([xmin_final, ymin_final, xmax_final, ymax_final])
         
         # Bounding box to tensor.
-        boxes = torch.as_tensor(boxes, dtype=torch.float32)
-        # Area of the bounding boxes.
-        area = (boxes[:, 3] - boxes[:, 1]) * (boxes[:, 2] - boxes[:, 0])
-        # No crowd instances.
-        iscrowd = torch.zeros((boxes.shape[0],), dtype=torch.int64)
-        # Labels to tensor.
-        labels = torch.as_tensor(labels, dtype=torch.int64)
+        if boxes:
+            boxes = torch.as_tensor(boxes, dtype=torch.float32)
+            # Area of the bounding boxes.
+            area = (boxes[:, 3] - boxes[:, 1]) * (boxes[:, 2] - boxes[:, 0])
+            # No crowd instances.
+            iscrowd = torch.zeros((boxes.shape[0],), dtype=torch.int64)
+            # Labels to tensor.
+            labels = torch.as_tensor(labels, dtype=torch.int64)
+        else:
+            boxes = torch.as_tensor(boxes, dtype=torch.float32)
+            # Area of the bounding boxes.
+            area = torch.as_tensor(0)
+            # No crowd instances.
+            iscrowd = torch.zeros((boxes.shape[0],), dtype=torch.int64)
+            # Labels to tensor.
+            labels = torch.zeros(5, dtype=torch.int64)#todo replace hard coded "5" with somthing more generic
         return image, image_resized, orig_boxes, \
             boxes, labels, area, iscrowd, (image_width, image_height)
 
@@ -200,26 +213,28 @@ class CustomDataset(Dataset):
             result_image[y1a:y2a, x1a:x2a] = image[y1b:y2b, x1b:x2b]
             padw = x1a - x1b
             padh = y1a - y1b
+            if len(boxes):
+                boxes[:, 0] += padw
+                boxes[:, 1] += padh
+                boxes[:, 2] += padw
+                boxes[:, 3] += padh
+                result_boxes.append(boxes)
+                for class_name in labels:
+                    result_classes.append(class_name)
 
-            boxes[:, 0] += padw
-            boxes[:, 1] += padh
-            boxes[:, 2] += padw
-            boxes[:, 3] += padh
-            
-            result_boxes.append(boxes)
-            for class_name in labels:
-                result_classes.append(class_name)
-
-        final_classes = []
-        result_boxes = np.concatenate(result_boxes, 0)
-        np.clip(result_boxes[:, 0:], 0, 2 * s, out=result_boxes[:, 0:])
-        result_boxes = result_boxes.astype(np.int32)
-        for idx in range(len(result_boxes)):
-            if ((result_boxes[idx,2]-result_boxes[idx,0])*(result_boxes[idx,3]-result_boxes[idx,1])) > 0:
-                final_classes.append(result_classes[idx])
-        result_boxes = result_boxes[
-            np.where((result_boxes[:,2]-result_boxes[:,0])*(result_boxes[:,3]-result_boxes[:,1]) > 0)
-        ]
+                final_classes = []
+                result_boxes = np.concatenate(result_boxes, 0)
+                np.clip(result_boxes[:, 0:], 0, 2 * s, out=result_boxes[:, 0:])
+                result_boxes = result_boxes.astype(np.int32)
+                for idx in range(len(result_boxes)):
+                    if ((result_boxes[idx,2]-result_boxes[idx,0])*(result_boxes[idx,3]-result_boxes[idx,1])) > 0:
+                        final_classes.append(result_classes[idx])
+                result_boxes = result_boxes[
+                    np.where((result_boxes[:,2]-result_boxes[:,0])*(result_boxes[:,3]-result_boxes[:,1]) > 0)
+                ]
+            else:
+                result_boxes = boxes
+                pass
         return orig_image, result_image/255., torch.tensor(result_boxes), \
             torch.tensor(np.array(final_classes)), area, iscrowd, dims
 
